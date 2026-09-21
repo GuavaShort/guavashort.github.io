@@ -303,7 +303,29 @@
     }
 
     .store-icon.gp {
-      background: linear-gradient(135deg, #42e695, #3bb2ff);
+      position: relative;
+      overflow: hidden;
+      background: conic-gradient(from -48deg at 42% 50%, #34a853 0 30%, #fbbc04 30% 52%, #ea4335 52% 76%, #4285f4 76% 100%);
+      clip-path: polygon(8% 0, 100% 50%, 8% 100%, 0 92%, 0 8%);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.26);
+    }
+
+    .store-icon.gp::before,
+    .store-icon.gp::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .store-icon.gp::before {
+      background:
+        linear-gradient(28deg, transparent 0 37%, rgba(255,255,255,0.82) 38% 41%, transparent 42% 100%),
+        linear-gradient(151deg, transparent 0 35%, rgba(255,255,255,0.62) 36% 39%, transparent 40% 100%);
+    }
+
+    .store-icon.gp::after {
+      border: 1px solid rgba(255,255,255,0.22);
     }
 
     .store-copy span {
@@ -1233,7 +1255,7 @@
               <p data-i18n="downloadCopy">Download GuavaShort to watch addictive AI dramas, trending short reels, and bite-sized stories anytime.</p>
               <div class="store-buttons" aria-label="Download GuavaShort">
                 <a class="store-btn" href="https://play.google.com/store/apps/details?id=guavashort.drama.shorts" target="_blank" rel="noopener noreferrer" aria-label="Get GuavaShort on Google Play">
-                  <span class="store-icon gp">▶</span>
+                  <span class="store-icon gp" aria-hidden="true"></span>
                   <span class="store-copy">
                     <span data-i18n="gpSmall">Get it on</span>
                     <strong>Google Play</strong>
@@ -1467,4 +1489,3 @@
   </script>
 </body>
 </html>
-
