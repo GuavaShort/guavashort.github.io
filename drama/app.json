@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "guavashort",
+  "name": "GuavaShort",
+  "logo": "./assets/guavashort.png",
+  "theme": {
+    "gradient": {
+      "angle": 94.255274,
+      "stops": [
+        {
+          "color": "#FF3780",
+          "position": 0
+        },
+        {
+          "color": "#DD4FE7",
+          "position": 1
+        }
+      ]
+    },
+    "textColor": "#FFFFFF"
+  },
+  "labels": {
+    "open": "Open",
+    "continue": "Continue Watching"
+  },
+  "stores": {
+    "android": "https://play.google.com/store/apps/details?id=guavashort.drama.shorts",
+    "ios": null
+  },
+  "attribution": {
+    "enabled": false,
+    "pixelId": "",
+    "adjustToken": "",
+    "extraParams": {},
+    "clickEvent": "StartButtonClick"
+  }
+}
