@@ -1,7 +1,7 @@
 # Updated at 2026/00/01 10:51:05
 
 # Admob
-google.com,pub-6555956274372099,DIRECT,f08c47fec0942fa0
+google.com,pub-8524248531176739,DIRECT,f08c47fec0942fa0
 
 # PangleGlobal
 pangleglobal.com,54852,DIRECT
