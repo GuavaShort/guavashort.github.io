@@ -1,7 +1,7 @@
 export const DETAIL_ENDPOINT = 'https://drama2-api.thinkyeah.com/api/drama/detail';
 
 function unavailable(state, reason) {
-  return {state, reason};
+  return { state, reason };
 }
 
 function coverFor(value) {
@@ -11,7 +11,11 @@ function coverFor(value) {
   try {
     if (/^[a-z][a-z\d+.-]*:/i.test(candidate)) {
       const url = new URL(candidate);
-      if ((url.protocol === 'https:' || url.protocol === 'http:') && !url.username && !url.password) {
+      if (
+        (url.protocol === 'https:' || url.protocol === 'http:') &&
+        !url.username &&
+        !url.password
+      ) {
         return url.href;
       }
       return '';
@@ -19,8 +23,13 @@ function coverFor(value) {
 
     const localPath = candidate.split(/[?#]/, 1)[0];
     const decodedPath = decodeURIComponent(localPath);
-    if (localPath === '' || candidate.startsWith('//') || candidate.includes('\\') ||
-        decodedPath.split('/').includes('..')) return '';
+    if (
+      localPath === '' ||
+      candidate.startsWith('//') ||
+      candidate.includes('\\') ||
+      decodedPath.split('/').includes('..')
+    )
+      return '';
     const url = new URL(candidate, 'https://local.invalid/');
     if (url.origin === 'https://local.invalid') {
       return candidate;
@@ -40,9 +49,12 @@ function requestEndpoint(endpoint) {
   throw new TypeError('Unsupported detail endpoint');
 }
 
-export async function loadDetail(search = '', {fetchImpl = globalThis.fetch, endpoint = DETAIL_ENDPOINT} = {}) {
+export async function loadDetail(
+  search = '',
+  { fetchImpl = globalThis.fetch, endpoint = DETAIL_ENDPOINT, defaultDramaId } = {},
+) {
   const params = new URLSearchParams(typeof search === 'string' ? search : search.toString());
-  const dramaId = params.get('drama_id');
+  const dramaId = params.has('drama_id') ? params.get('drama_id') : defaultDramaId;
   const platformId = dramaId?.endsWith('-self') ? dramaId.slice(0, -5) : '';
   const language = params.get('language') ?? 'en';
 
@@ -78,8 +90,15 @@ export async function loadDetail(search = '', {fetchImpl = globalThis.fetch, end
     return unavailable('error', 'invalid-json-response');
   }
   if (payload?.code === 404000) return unavailable('not-found', 'drama-not-found');
-  if (!response.ok || payload?.code !== 200 || !payload.data || typeof payload.data !== 'object' ||
-      Array.isArray(payload.data) || typeof payload.data.name !== 'string' || payload.data.name.trim() === '') {
+  if (
+    !response.ok ||
+    payload?.code !== 200 ||
+    !payload.data ||
+    typeof payload.data !== 'object' ||
+    Array.isArray(payload.data) ||
+    typeof payload.data.name !== 'string' ||
+    payload.data.name.trim() === ''
+  ) {
     return unavailable('error', 'unrecognized-detail-response');
   }
 
@@ -92,7 +111,7 @@ export async function loadDetail(search = '', {fetchImpl = globalThis.fetch, end
       title: data.name,
       description: typeof data.description === 'string' ? data.description : '',
       coverUrl: coverFor(data.cover),
-      tags: Array.isArray(data.tags) ? data.tags.filter(tag => typeof tag === 'string') : [],
+      tags: Array.isArray(data.tags) ? data.tags.filter((tag) => typeof tag === 'string') : [],
     },
   };
 }

@@ -1,6 +1,11 @@
 :root {
   color-scheme: dark;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   background: #000;
   color: #fff;
   font-synthesis: none;
@@ -268,7 +273,7 @@ button {
   height: 0;
 }
 
-.drama-description[data-more-below="true"] {
+.drama-description[data-more-below='true'] {
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%);
 }
@@ -359,7 +364,7 @@ button {
   cursor: pointer;
 }
 
-body[data-state="error"] .status-message {
+body[data-state='error'] .status-message {
   right: 82px;
 }
 
@@ -375,12 +380,24 @@ button:focus-visible {
     padding-left: 16px;
   }
 
-  .drama-info { margin-inline: 16px; }
+  .drama-info {
+    margin-inline: 16px;
+  }
 
-  .action-dock { margin-inline: 16px; }
+  .action-dock {
+    margin-inline: 16px;
+  }
 
-  .continue-button { padding-left: 12px; padding-right: 40px; }
-  .hand-animation { width: 60px; height: 60px; top: 12px; right: -6px; }
+  .continue-button {
+    padding-left: 12px;
+    padding-right: 40px;
+  }
+  .hand-animation {
+    width: 60px;
+    height: 60px;
+    top: 12px;
+    right: -6px;
+  }
 
   .status-message {
     right: 16px;
@@ -388,19 +405,102 @@ button:focus-visible {
     font-size: 9px;
   }
 
-  .retry-button { right: 16px; }
-  .preview-marker { right: 16px; }
+  .retry-button {
+    right: 16px;
+  }
+  .preview-marker {
+    right: 16px;
+  }
 }
 
-.play-icon{width:18px;height:18px;flex:0 0 18px;background:var(--brand-text);mask:url('./assets/cta-play.svg') center/contain no-repeat;-webkit-mask:url('./assets/cta-play.svg') center/contain no-repeat}
-.hand-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.hand-animation:has(svg) .hand-fallback{display:none}
-.loading-skeleton{display:none;flex:1 0 100px;min-height:0;overflow:hidden;margin:0 20px}
-.skeleton-title,.skeleton-tags i,.skeleton-line{background:rgb(255 255 255 / 12%);border-radius:4px}
-.skeleton-title{height:23px}.skeleton-tags{display:flex;gap:6px;margin-top:6px;height:17px}.skeleton-tags i{display:block;width:64px;height:17px}
-.skeleton-line{height:17px;margin-top:12px}.skeleton-line.short{width:134px}
-body[data-state="loading"] .loading-skeleton{display:block}body[data-state="loading"] .drama-info{display:none}
-body[data-state="loading"] .status-message{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
-body[data-state="loading"] .cover-placeholder{background:#141414}body[data-state="loading"] .cover-placeholder span{visibility:hidden}
-body[data-state="loading"] .cover-placeholder::after{content:'';position:absolute;inset:-15% -50%;background:linear-gradient(110deg,transparent 32%,rgb(255 255 255 / 8%) 50%,transparent 68%);animation:shimmer 1.8s linear infinite}
-@keyframes shimmer{from{transform:translateX(-50%)}to{transform:translateX(50%)}}
-@media(prefers-reduced-motion:reduce){body[data-state="loading"] .cover-placeholder::after{animation:none}}
+.play-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  background: var(--brand-text);
+  mask: url('./assets/cta-play.svg') center/contain no-repeat;
+  -webkit-mask: url('./assets/cta-play.svg') center/contain no-repeat;
+}
+.hand-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.hand-animation:has(svg) .hand-fallback {
+  display: none;
+}
+.loading-skeleton {
+  display: none;
+  flex: 1 0 100px;
+  min-height: 0;
+  overflow: hidden;
+  margin: 0 20px;
+}
+.skeleton-title,
+.skeleton-tags i,
+.skeleton-line {
+  background: rgb(255 255 255 / 12%);
+  border-radius: 4px;
+}
+.skeleton-title {
+  height: 23px;
+}
+.skeleton-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  height: 17px;
+}
+.skeleton-tags i {
+  display: block;
+  width: 64px;
+  height: 17px;
+}
+.skeleton-line {
+  height: 17px;
+  margin-top: 12px;
+}
+.skeleton-line.short {
+  width: 134px;
+}
+body[data-state='loading'] .loading-skeleton {
+  display: block;
+}
+body[data-state='loading'] .drama-info {
+  display: none;
+}
+body[data-state='loading'] .status-message {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+body[data-state='loading'] .cover-placeholder {
+  background: #141414;
+}
+body[data-state='loading'] .cover-placeholder span {
+  visibility: hidden;
+}
+body[data-state='loading'] .cover-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: -15% -50%;
+  background: linear-gradient(110deg, transparent 32%, rgb(255 255 255 / 8%) 50%, transparent 68%);
+  animation: shimmer 1.8s linear infinite;
+}
+@keyframes shimmer {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-state='loading'] .cover-placeholder::after {
+    animation: none;
+  }
+}

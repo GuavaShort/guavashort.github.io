@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "guavashort",
+  "defaultDramaId": "1000392-self",
   "name": "GuavaShort",
   "logo": "./assets/guavashort.png",
   "theme": {
@@ -28,8 +29,8 @@
     "ios": null
   },
   "attribution": {
-    "enabled": false,
-    "pixelId": "",
+    "enabled": true,
+    "pixelId": "4564459330468622",
     "adjustToken": "",
     "extraParams": {},
     "clickEvent": "StartButtonClick"

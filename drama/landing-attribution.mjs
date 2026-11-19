@@ -5,16 +5,21 @@ let clickEvent = '';
 
 export function startAttribution(config, appId) {
   if (active || config?.enabled !== true) return;
-  if (typeof config.pixelId !== 'string' || !config.pixelId.trim() ||
-      typeof config.adjustToken !== 'string' || !config.adjustToken.trim()) {
-    console.warn('Attribution is enabled but pixelId or adjustToken is missing. Tracking was skipped.');
+  if (
+    typeof config.pixelId !== 'string' ||
+    !config.pixelId.trim() ||
+    (config.adjustToken !== undefined && typeof config.adjustToken !== 'string')
+  ) {
+    console.warn(
+      'Attribution is enabled but pixelId is missing or adjustToken is invalid. Tracking was skipped.',
+    );
     return;
   }
   try {
-    const task = window.AdAttribution.init({...config, appId});
+    const task = window.AdAttribution.init({ ...config, appId });
     active = true;
     clickEvent = typeof config.clickEvent === 'string' ? config.clickEvent.trim() : '';
-    void task.catch(error => console.warn('Attribution initialization failed.', error));
+    void task.catch((error) => console.warn('Attribution initialization failed.', error));
   } catch (error) {
     console.warn('Attribution initialization failed.', error);
   }
@@ -23,7 +28,7 @@ export function startAttribution(config, appId) {
 export function trackStoreClick(position, appId, platform) {
   if (!active || !clickEvent) return;
   try {
-    window.AdAttribution.track(clickEvent, {position, app_id: appId, platform});
+    window.AdAttribution.track(clickEvent, { position, app_id: appId, platform });
   } catch (error) {
     console.warn('Attribution click event failed.', error);
   }

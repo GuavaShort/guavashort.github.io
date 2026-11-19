@@ -8,11 +8,14 @@
 
   function readCookie(name) {
     var prefix = name + '=';
-    var item = document.cookie.split(';').map(function (value) {
-      return value.trim();
-    }).find(function (value) {
-      return value.indexOf(prefix) === 0;
-    });
+    var item = document.cookie
+      .split(';')
+      .map(function (value) {
+        return value.trim();
+      })
+      .find(function (value) {
+        return value.indexOf(prefix) === 0;
+      });
     return item ? item.slice(prefix.length) : '';
   }
 
@@ -106,7 +109,9 @@
       window.localStorage.setItem(storageKey, 'true');
     } catch (error) {
       // Browsers can deny storage. The existing landingTask still deduplicates this page.
-      window.console.warn('Adjust deduplication storage unavailable; refresh deduplication is disabled.');
+      window.console.warn(
+        'Adjust deduplication storage unavailable; refresh deduplication is disabled.',
+      );
     }
     var image = new window.Image();
     // 持有引用，直到请求结束。
@@ -114,8 +119,7 @@
     image.onload = image.onerror = function () {
       pendingImages.delete(image);
     };
-    image.src = 'https://app.adjust.com/' + encodeURIComponent(token)
-      + '?' + params.toString();
+    image.src = 'https://app.adjust.com/' + encodeURIComponent(token) + '?' + params.toString();
   }
 
   function init(options) {
@@ -124,8 +128,8 @@
     options = options || {};
     var id = String(options.pixelId || '').trim();
     var token = String(options.adjustToken || '').trim();
-    if (!id || !token) {
-      throw new Error('请填写 pixelId 和 adjustToken。');
+    if (!id) {
+      throw new Error('请填写 pixelId。');
     }
 
     // 初始化时保存落地参数，避免后续页面操作修改 URL。
@@ -133,15 +137,18 @@
     var timestamp = Date.now();
     var extraParams = Object.assign({}, options.extraParams || {});
     var scope = String(options.appId || window.location.pathname.replace(/[^/]*$/, ''));
-    var storageKey = 'drama:adjust-sent:' + encodeURIComponent(scope) + ':' + encodeURIComponent(token);
     pixelId = id;
     initializePixel(pixelId);
     window.fbq('track', 'PageView');
 
     landingTask = waitForBrowserId().then(function () {
       window.fbq('track', 'ViewContent');
-      var params = buildAdjustParams(entryQuery, timestamp, extraParams);
-      sendAdjust(token, params, storageKey);
+      if (token) {
+        var params = buildAdjustParams(entryQuery, timestamp, extraParams);
+        var storageKey =
+          'drama:adjust-sent:' + encodeURIComponent(scope) + ':' + encodeURIComponent(token);
+        sendAdjust(token, params, storageKey);
+      }
     });
     return landingTask;
   }

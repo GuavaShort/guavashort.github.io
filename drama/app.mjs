@@ -1,10 +1,10 @@
-import {startAttribution,trackStoreClick} from './landing-attribution.mjs';
-import {loadDetail} from './detail.mjs';
-import {validateAppConfig} from './app-config.mjs';
-import {devicePlatform,createStoreNavigator} from './navigation.mjs';
+import { startAttribution, trackStoreClick } from './landing-attribution.mjs';
+import { loadDetail } from './detail.mjs';
+import { validateAppConfig } from './app-config.mjs';
+import { devicePlatform, createStoreNavigator } from './navigation.mjs';
 
-const byTestId = id => document.querySelector(`[data-testid="${id}"]`);
-const byAction = action => document.querySelector(`[data-action="${action}"]`);
+const byTestId = (id) => document.querySelector(`[data-testid="${id}"]`);
+const byAction = (action) => document.querySelector(`[data-action="${action}"]`);
 const status = document.querySelector('[role="status"]');
 const retryButton = byAction('retry');
 const cover = byTestId('drama-cover');
@@ -13,9 +13,11 @@ const backdrop = byTestId('backdrop');
 const synopsis = byTestId('drama-description');
 
 function updateSynopsisFade() {
-  synopsis.dataset.moreBelow = String(synopsis.scrollHeight - synopsis.clientHeight - synopsis.scrollTop > 1);
+  synopsis.dataset.moreBelow = String(
+    synopsis.scrollHeight - synopsis.clientHeight - synopsis.scrollTop > 1,
+  );
 }
-synopsis.addEventListener('scroll', updateSynopsisFade, {passive: true});
+synopsis.addEventListener('scroll', updateSynopsisFade, { passive: true });
 new ResizeObserver(updateSynopsisFade).observe(synopsis);
 const previewMode = document.querySelector('meta[name="preview-mode"]').content === 'true';
 const endpoint = document.querySelector('meta[name="detail-endpoint"]').content;
@@ -29,7 +31,7 @@ function setState(state, message = '') {
 }
 
 function navigate(detectedPlatform) {
-  launchStore(appConfig.stores,detectedPlatform,window.location.search);
+  launchStore(appConfig.stores, detectedPlatform, window.location.search);
 }
 function openStore(position) {
   const detectedPlatform = devicePlatform(navigator);
@@ -49,7 +51,7 @@ function applyAppConfig(config) {
   document.querySelector('.continue-button span').textContent = appConfig.labels.continue;
 
   const stops = appConfig.theme.gradient.stops
-    .map(stop => `${stop.color} ${stop.position * 100}%`)
+    .map((stop) => `${stop.color} ${stop.position * 100}%`)
     .join(', ');
   document.body.style.setProperty(
     '--brand-gradient',
@@ -57,10 +59,14 @@ function applyAppConfig(config) {
   );
   document.body.style.setProperty('--brand-text', appConfig.theme.textColor);
 
-  for(const name of ['open','cover','continue']) {
-    const action=byAction(name);action.disabled=false;action.removeAttribute('aria-disabled');action.onclick=()=>openStore(name);
+  for (const name of ['open', 'cover', 'continue']) {
+    const action = byAction(name);
+    action.disabled = false;
+    action.removeAttribute('aria-disabled');
+    action.onclick = () => openStore(name);
   }
-  document.querySelector('.continue-button .play-icon').style.backgroundColor=appConfig.theme.textColor;
+  document.querySelector('.continue-button .play-icon').style.backgroundColor =
+    appConfig.theme.textColor;
   byTestId('preview-marker').hidden = !previewMode;
 }
 
@@ -82,17 +88,25 @@ function bindCover(drama) {
   cover.hidden = false;
   placeholder.hidden = false;
   placeholder.querySelector('span').textContent = 'Loading cover…';
-  cover.addEventListener('load', () => {
-    if (cover.naturalWidth > 0) {
-      placeholder.hidden = true;
-      backdrop.src = cover.currentSrc;
-      backdrop.hidden = false;
-    }
-  }, {once: true});
-  cover.addEventListener('error', () => {
-    setCoverPlaceholder('Cover unavailable');
-    backdrop.hidden = true;
-  }, {once: true});
+  cover.addEventListener(
+    'load',
+    () => {
+      if (cover.naturalWidth > 0) {
+        placeholder.hidden = true;
+        backdrop.src = cover.currentSrc;
+        backdrop.hidden = false;
+      }
+    },
+    { once: true },
+  );
+  cover.addEventListener(
+    'error',
+    () => {
+      setCoverPlaceholder('Cover unavailable');
+      backdrop.hidden = true;
+    },
+    { once: true },
+  );
   if (drama.coverUrl) {
     cover.src = drama.coverUrl;
   } else {
@@ -103,7 +117,8 @@ function bindCover(drama) {
 function showDetail(result) {
   document.body.dataset.dramaId = result.drama.id;
   byTestId('drama-title').textContent = result.drama.title;
-  byTestId('drama-description').textContent = result.drama.description || 'No description available.';
+  byTestId('drama-description').textContent =
+    result.drama.description || 'No description available.';
   const tags = byTestId('drama-tags');
   tags.replaceChildren();
   for (const value of result.drama.tags) {
@@ -129,7 +144,9 @@ function showResult(result) {
   byTestId('drama-title').textContent = '';
   byTestId('drama-description').textContent = '';
   byTestId('drama-tags').replaceChildren();
-  setCoverPlaceholder(result.state === 'missing' ? 'Add a drama ID to show its cover' : 'Cover unavailable');
+  setCoverPlaceholder(
+    result.state === 'missing' ? 'Add a drama ID to show its cover' : 'Cover unavailable',
+  );
   retryButton.hidden = result.state !== 'error';
 
   if (result.state === 'missing') {
@@ -143,7 +160,10 @@ function showResult(result) {
 
 async function requestDrama() {
   setState('loading', 'Loading drama details…');
-  const result = await loadDetail(window.location.search, {endpoint});
+  const result = await loadDetail(window.location.search, {
+    endpoint,
+    defaultDramaId: appConfig.defaultDramaId,
+  });
   showResult(result);
 }
 
@@ -152,15 +172,28 @@ retryButton.addEventListener('click', () => {
 });
 
 function startAnimation() {
-  const player=globalThis.lottie;
-  if(!player)return;
-  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const animation=player.loadAnimation({container:byTestId('hand'),renderer:'svg',loop:!reduceMotion,autoplay:!reduceMotion,path:'./lottie/finger-double-tap.json',rendererSettings:{preserveAspectRatio:'xMidYMid meet'}});
-  if(reduceMotion)animation.addEventListener('DOMLoaded',()=>animation.goToAndStop(0,true));
+  const player = globalThis.lottie;
+  if (!player) return;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const animation = player.loadAnimation({
+    container: byTestId('hand'),
+    renderer: 'svg',
+    loop: !reduceMotion,
+    autoplay: !reduceMotion,
+    path: './lottie/finger-double-tap.json',
+    rendererSettings: { preserveAspectRatio: 'xMidYMid meet' },
+  });
+  if (reduceMotion) animation.addEventListener('DOMLoaded', () => animation.goToAndStop(0, true));
 }
 async function start() {
   startAnimation();
-  try {await readAppConfig();await requestDrama();}
-  catch {retryButton.hidden=true;setCoverPlaceholder('Page settings unavailable');setState('error','Page settings could not be loaded. Please reload to try again.');}
+  try {
+    await readAppConfig();
+    await requestDrama();
+  } catch {
+    retryButton.hidden = true;
+    setCoverPlaceholder('Page settings unavailable');
+    setState('error', 'Page settings could not be loaded. Please reload to try again.');
+  }
 }
 void start();
