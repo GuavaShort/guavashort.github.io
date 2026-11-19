@@ -1,7 +1,13 @@
 {
   "schemaVersion": 1,
   "id": "guavashort",
-  "defaultDramaId": "1000392-self",
+  "dramaFallback": {
+    "defaultLanguage": "en",
+    "byLanguage": {
+      "en": "1000392-self",
+      "es": "1001837-self"
+    }
+  },
   "name": "GuavaShort",
   "logo": "./assets/guavashort.png",
   "theme": {
@@ -31,7 +37,7 @@
   "attribution": {
     "enabled": true,
     "pixelId": "4564459330468622",
-    "adjustToken": "",
+    "adjustToken": "26ccbecl",
     "extraParams": {},
     "clickEvent": "StartButtonClick"
   }

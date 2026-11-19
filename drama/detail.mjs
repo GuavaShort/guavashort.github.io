@@ -51,12 +51,22 @@ function requestEndpoint(endpoint) {
 
 export async function loadDetail(
   search = '',
-  { fetchImpl = globalThis.fetch, endpoint = DETAIL_ENDPOINT, defaultDramaId } = {},
+  { fetchImpl = globalThis.fetch, endpoint = DETAIL_ENDPOINT, defaultDramaId, dramaFallback } = {},
 ) {
   const params = new URLSearchParams(typeof search === 'string' ? search : search.toString());
-  const dramaId = params.has('drama_id') ? params.get('drama_id') : defaultDramaId;
+  let language = params.get('language') ?? dramaFallback?.defaultLanguage ?? 'en';
+  let dramaId = params.get('drama_id');
+  if (!params.has('drama_id')) {
+    if (dramaFallback) {
+      if (!Object.hasOwn(dramaFallback.byLanguage, language)) {
+        language = dramaFallback.defaultLanguage;
+      }
+      dramaId = dramaFallback.byLanguage[language];
+    } else {
+      dramaId = defaultDramaId;
+    }
+  }
   const platformId = dramaId?.endsWith('-self') ? dramaId.slice(0, -5) : '';
-  const language = params.get('language') ?? 'en';
 
   if (platformId.trim() === '') {
     return unavailable('missing', 'missing-drama-id');

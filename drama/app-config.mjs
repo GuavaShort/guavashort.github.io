@@ -1,5 +1,8 @@
 const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const hexColor = (value) => typeof value === 'string' && /^#[\da-f]{6}$/i.test(value);
+const validDramaId = (value) => typeof value === 'string' && /^[1-9]\d*-self$/.test(value);
+const validLanguage = (value) =>
+  typeof value === 'string' && /^[a-z]{2}(?:-[a-zA-Z0-9]{2,8})*$/.test(value);
 
 function validStore(value) {
   if (value === null) return true;
@@ -69,11 +72,23 @@ export function validateAppConfig(config) {
     throw new TypeError('Invalid app labels or store destinations');
   }
 
-  if (
-    config.defaultDramaId !== undefined &&
-    (typeof config.defaultDramaId !== 'string' || !/^[1-9]\d*-self$/.test(config.defaultDramaId))
-  ) {
+  if (config.defaultDramaId !== undefined && !validDramaId(config.defaultDramaId)) {
     throw new TypeError('Invalid default drama ID');
+  }
+
+  if (config.dramaFallback !== undefined) {
+    const fallback = config.dramaFallback;
+    if (
+      !record(fallback) ||
+      !validLanguage(fallback.defaultLanguage) ||
+      !record(fallback.byLanguage) ||
+      !Object.hasOwn(fallback.byLanguage, fallback.defaultLanguage) ||
+      Object.entries(fallback.byLanguage).some(
+        ([language, dramaId]) => !validLanguage(language) || !validDramaId(dramaId),
+      )
+    ) {
+      throw new TypeError('Invalid drama fallback configuration');
+    }
   }
 
   // Keep legacy /assets values local to this landing page under repository paths.

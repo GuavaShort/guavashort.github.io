@@ -163,6 +163,7 @@ async function requestDrama() {
   const result = await loadDetail(window.location.search, {
     endpoint,
     defaultDramaId: appConfig.defaultDramaId,
+    dramaFallback: appConfig.dramaFallback,
   });
   showResult(result);
 }
