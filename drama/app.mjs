@@ -34,7 +34,7 @@ function openStore(position) {
   const detectedPlatform = devicePlatform(navigator);
   const search = window.location.search;
   trackStoreClick(position, appConfig.id, detectedPlatform ?? 'android');
-  if (position === 'continue' && detectedPlatform === 'android') {
+  if (detectedPlatform === 'android') {
     const playUrl = googlePlayDestination(appConfig.stores, search);
     const adjustUrl = getAdjustClickUrl(playUrl);
     if (adjustUrl) {
