@@ -1,7 +1,7 @@
-import { startAttribution, trackStoreClick } from './landing-attribution.mjs';
+import { getAdjustClickUrl, startAttribution, trackStoreClick } from './landing-attribution.mjs';
 import { loadDetail } from './detail.mjs';
 import { validateAppConfig } from './app-config.mjs';
-import { devicePlatform, createStoreNavigator } from './navigation.mjs';
+import { createStoreNavigator, devicePlatform, googlePlayDestination } from './navigation.mjs';
 
 const byTestId = (id) => document.querySelector(`[data-testid="${id}"]`);
 const byAction = (action) => document.querySelector(`[data-action="${action}"]`);
@@ -30,13 +30,19 @@ function setState(state, message = '') {
   status.textContent = message;
 }
 
-function navigate(detectedPlatform) {
-  launchStore(appConfig.stores, detectedPlatform, window.location.search);
-}
 function openStore(position) {
   const detectedPlatform = devicePlatform(navigator);
+  const search = window.location.search;
   trackStoreClick(position, appConfig.id, detectedPlatform ?? 'android');
-  navigate(detectedPlatform);
+  if (position === 'continue' && detectedPlatform === 'android') {
+    const playUrl = googlePlayDestination(appConfig.stores, search);
+    const adjustUrl = getAdjustClickUrl(playUrl);
+    if (adjustUrl) {
+      window.location.assign(adjustUrl);
+      return;
+    }
+  }
+  launchStore(appConfig.stores, detectedPlatform, search);
 }
 
 function applyAppConfig(config) {
@@ -74,7 +80,7 @@ async function readAppConfig() {
   const response = await fetch('./app.json');
   if (!response.ok) throw new Error(`App settings could not be loaded (${response.status}).`);
   applyAppConfig(await response.json());
-  startAttribution(appConfig.attribution, appConfig.id);
+  startAttribution(appConfig.attribution);
 }
 
 function setCoverPlaceholder(message = 'Cover unavailable') {

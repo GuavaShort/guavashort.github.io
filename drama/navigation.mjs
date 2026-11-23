@@ -4,22 +4,27 @@ export function devicePlatform({ userAgent = '', platform = '', maxTouchPoints =
   if (/Android/i.test(userAgent)) return 'android';
   return null;
 }
+
+function isGooglePlayListing(url) {
+  return url.hostname === 'play.google.com' && url.pathname === '/store/apps/details';
+}
+
 export function storeDestination(stores, platform, search = '') {
   const configured = stores?.[platform];
   if (!configured) return null;
   const url = new URL(configured);
   if (url.protocol !== 'https:' || url.username || url.password) return null;
   const rawQuery = search.startsWith('?') ? search.slice(1) : search;
-  if (
-    platform === 'android' &&
-    url.hostname === 'play.google.com' &&
-    url.pathname === '/store/apps/details' &&
-    rawQuery
-  ) {
+  if (platform === 'android' && isGooglePlayListing(url) && rawQuery) {
     url.searchParams.set('referrer', rawQuery);
     return url.href;
   }
   return configured;
+}
+
+export function googlePlayDestination(stores, search = '') {
+  const destination = storeDestination(stores, 'android', search);
+  return destination && isGooglePlayListing(new URL(destination)) ? destination : null;
 }
 
 // Native store URLs are only selected for a detected mobile platform.
@@ -30,12 +35,7 @@ export function storeLaunchDestination(stores, detectedPlatform, search = '') {
   if (detectedPlatform === 'ios' && ['apps.apple.com', 'itunes.apple.com'].includes(url.hostname)) {
     return destination.replace(/^https:/, 'itms-apps:');
   }
-  if (
-    detectedPlatform !== 'android' ||
-    url.hostname !== 'play.google.com' ||
-    url.pathname !== '/store/apps/details'
-  )
-    return destination;
+  if (detectedPlatform !== 'android' || !isGooglePlayListing(url)) return destination;
   return `intent://details${url.search}#Intent;scheme=market;package=com.android.vending;S.browser_fallback_url=${encodeURIComponent(destination)};end`;
 }
 

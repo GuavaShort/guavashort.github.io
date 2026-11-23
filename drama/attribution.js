@@ -1,9 +1,7 @@
 (function (window, document) {
   if (window.AdAttribution) return;
 
-  var pixelId = '';
-  var landingTask = null;
-  var pendingImages = new Set();
+  var landing = null;
   var sdkUrl = 'https://connect.facebook.net/en_US/fbevents.js';
 
   function readCookie(name) {
@@ -44,21 +42,6 @@
     }
 
     window.fbq('init', id);
-  }
-
-  function waitForBrowserId() {
-    return new Promise(function (resolve) {
-      var attempts = 0;
-      function check() {
-        if (readCookie('_fbp') || attempts >= 10) {
-          resolve();
-          return;
-        }
-        attempts += 1;
-        window.setTimeout(check, 100);
-      }
-      check();
-    });
   }
 
   function buildAdjustParams(entryQuery, timestamp, extraParams) {
@@ -102,29 +85,17 @@
     return params;
   }
 
-  function sendAdjust(token, params, storageKey) {
-    try {
-      if (window.localStorage.getItem(storageKey) === 'true') return;
-      // Mark the attempt before dispatch; image onerror may be a normal store redirect.
-      window.localStorage.setItem(storageKey, 'true');
-    } catch (error) {
-      // Browsers can deny storage. The existing landingTask still deduplicates this page.
-      window.console.warn(
-        'Adjust deduplication storage unavailable; refresh deduplication is disabled.',
-      );
-    }
-    var image = new window.Image();
-    // 持有引用，直到请求结束。
-    pendingImages.add(image);
-    image.onload = image.onerror = function () {
-      pendingImages.delete(image);
-    };
-    image.src = 'https://app.adjust.com/' + encodeURIComponent(token) + '?' + params.toString();
+  function getAdjustClickUrl(playUrl) {
+    if (!landing || !landing.token) return null;
+    var url = new URL('https://app.adjust.com/' + encodeURIComponent(landing.token));
+    var params = buildAdjustParams(landing.entryQuery, landing.timestamp, landing.extraParams);
+    if (playUrl) params.set('redirect_android', playUrl);
+    url.search = params.toString();
+    return url.href;
   }
 
   function init(options) {
-    // 同一页面重复初始化时，复用第一次的调用。
-    if (landingTask) return landingTask;
+    if (landing) return;
     options = options || {};
     var id = String(options.pixelId || '').trim();
     var token = String(options.adjustToken || '').trim();
@@ -132,33 +103,25 @@
       throw new Error('请填写 pixelId。');
     }
 
-    // 初始化时保存落地参数，避免后续页面操作修改 URL。
     var entryQuery = window.location.search;
     var timestamp = Date.now();
-    var extraParams = Object.assign({}, options.extraParams || {});
-    var scope = String(options.appId || window.location.pathname.replace(/[^/]*$/, ''));
-    pixelId = id;
-    initializePixel(pixelId);
+    initializePixel(id);
     window.fbq('track', 'PageView');
-
-    landingTask = waitForBrowserId().then(function () {
-      window.fbq('track', 'ViewContent');
-      if (token) {
-        var params = buildAdjustParams(entryQuery, timestamp, extraParams);
-        var storageKey =
-          'drama:adjust-sent:' + encodeURIComponent(scope) + ':' + encodeURIComponent(token);
-        sendAdjust(token, params, storageKey);
-      }
-    });
-    return landingTask;
+    window.fbq('track', 'ViewContent');
+    landing = {
+      token: token,
+      entryQuery: entryQuery,
+      timestamp: timestamp,
+      extraParams: Object.assign({}, options.extraParams || {}),
+    };
   }
 
   function track(eventName, eventParams) {
-    if (!pixelId) {
+    if (!landing) {
       throw new Error('请先调用 AdAttribution.init()。');
     }
     window.fbq('trackCustom', eventName, eventParams || {});
   }
 
-  window.AdAttribution = { init: init, track: track };
+  window.AdAttribution = { init: init, track: track, getAdjustClickUrl: getAdjustClickUrl };
 })(window, document);

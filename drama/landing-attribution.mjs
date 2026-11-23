@@ -3,7 +3,7 @@ import './attribution.js';
 let active = false;
 let clickEvent = '';
 
-export function startAttribution(config, appId) {
+export function startAttribution(config) {
   if (active || config?.enabled !== true) return;
   if (
     typeof config.pixelId !== 'string' ||
@@ -16,13 +16,16 @@ export function startAttribution(config, appId) {
     return;
   }
   try {
-    const task = window.AdAttribution.init({ ...config, appId });
+    window.AdAttribution.init(config);
     active = true;
     clickEvent = typeof config.clickEvent === 'string' ? config.clickEvent.trim() : '';
-    void task.catch((error) => console.warn('Attribution initialization failed.', error));
   } catch (error) {
     console.warn('Attribution initialization failed.', error);
   }
+}
+
+export function getAdjustClickUrl(playUrl) {
+  return window.AdAttribution.getAdjustClickUrl(playUrl);
 }
 
 export function trackStoreClick(position, appId, platform) {
